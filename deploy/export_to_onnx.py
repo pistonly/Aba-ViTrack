@@ -63,7 +63,8 @@ def build_model():
 
     model = AbaViTrack(
         backbone,
-        box_head
+        box_head,
+        output_tuple=True
     )
 
     return model

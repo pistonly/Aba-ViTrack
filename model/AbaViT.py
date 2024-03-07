@@ -186,7 +186,7 @@ class VisionTransformer(nn.Module):
 
         self.cat_mode = 'direct'
 
-    def forward_features_act_token(self, z, x, t_mask=None, s_mask=None):
+    def forward_features_act_token(self, z, x, t_mask=None, s_mask=None, return_aux=True):
         B, H, W = x.shape[0], x.shape[2], x.shape[3]
         if not t_mask is None:
             t_mask = t_mask[:,0:t_mask.shape[1]:self.patch_size,0:t_mask.shape[2]:self.patch_size]
@@ -281,17 +281,23 @@ class VisionTransformer(nn.Module):
         lens_x = self.pos_embed_x.shape[1]
         x = recover_tokens(x, lens_z, lens_x, mode=self.cat_mode)
 
-        aux_dict = {"attn": None}
-        return x, aux_dict
-
-    def forward(self, z, x, t_mask=None, s_mask=None):
-        if self.args.act_mode == 4:
-            x, aux_dict = self.forward_features_act_token(z,x, t_mask=t_mask, s_mask=s_mask)
+        if return_aux:
+            aux_dict = {"attn": None}
+            return x, aux_dict
         else:
-            print('Not implemented yet, please specify for token act.')
-            exit()
+            return x
 
-        return x, aux_dict
+    def forward(self, z, x, t_mask=None, s_mask=None, return_aux=True):
+        if return_aux:
+            if self.args.act_mode == 4:
+                x, aux_dict = self.forward_features_act_token(z,x, t_mask=t_mask, s_mask=s_mask, return_aux=True)
+            else:
+                print('Not implemented yet, please specify for token act.')
+                exit()
+
+            return x, aux_dict
+        else:
+            return self.forward_features_act_token(z,x, t_mask=t_mask, s_mask=s_mask, return_aux=False)
 
 
 from argparse import Namespace
