@@ -40,9 +40,9 @@ def export_onnx(model, file_path, template_size, search_size, dynamic=False):
             model.cpu() if dynamic else model,  # dynamic=True only compatible with cpu
             (template, search),
             file_path,
-            verbose=True,
+            verbose=False,
             opset_version=13,
-            do_constant_folding=False,  # WARNING: DNN inference with torch>=1.12 may require do_constant_folding=False
+            do_constant_folding=True,  # WARNING: DNN inference with torch>=1.12 may require do_constant_folding=False
             input_names=['template', 'search'],
             output_names=output_names,
             dynamic_axes=dynamic or None)
